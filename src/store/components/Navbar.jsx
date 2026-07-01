@@ -1,6 +1,6 @@
 import React from 'react'
 import { IoIosStarHalf } from "react-icons/io";
-import { MdOutlineStarPurple500 } from "react-icons/md";
+import { MdOutlineStarPurple500, MdFileDownload, MdClose } from "react-icons/md";
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,8 @@ import Cart from "./Cart";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showInstallModal, setShowInstallModal] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
   const { t, i18n } = useTranslation();
   const activeLang = (i18n.language || "uz").toUpperCase();
 
@@ -18,10 +20,38 @@ function Navbar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Android/Chrome uchun install promptni ushlab qolish
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
   const changeLang = (lang) => {
     const code = lang.toLowerCase();
     i18n.changeLanguage(code);
     localStorage.setItem("lang", code);
+  };
+
+  const handleInstallClick = async () => {
+    const isInStandaloneMode =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+
+    if (isInStandaloneMode) return; // allaqachon o'rnatilgan
+
+    if (deferredPrompt) {
+      // Android/Chrome - haqiqiy o'rnatish oynasi
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      setDeferredPrompt(null);
+    } else {
+      // iPhone yoki boshqa holatlar - ko'rsatma modali
+      setShowInstallModal(true);
+    }
   };
 
   const links = [
@@ -84,6 +114,17 @@ function Navbar() {
               </button>
             ))}
           </div>
+
+          {/* Install button */}
+          <button
+            onClick={handleInstallClick}
+            title={t("install.tooltip")}
+            className='flex items-center justify-center w-10 h-10 max-sm:w-9 max-sm:h-9
+                       rounded-xl bg-gray-100 text-red-800 cursor-pointer
+                       hover:bg-red-800 hover:text-white transition-all duration-300 ease-in-out'
+          >
+            <MdFileDownload className='text-xl' />
+          </button>
 
           {/* Cart */}
           <Cart />
@@ -161,6 +202,48 @@ function Navbar() {
         </div>
 
       </div>
+
+      {/* Install instructions modal (iPhone va boshqalar uchun) */}
+      {showInstallModal && (
+        <div
+          className='fixed inset-0 z-[999999] flex items-end sm:items-center justify-center bg-black/50 px-4 pb-4 sm:pb-0'
+          onClick={() => setShowInstallModal(false)}
+        >
+          <div
+            className='bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 relative'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowInstallModal(false)}
+              className='absolute top-4 right-4 text-gray-400 hover:text-red-800 cursor-pointer'
+            >
+              <MdClose className='text-xl' />
+            </button>
+
+            <div className='flex items-center gap-3 mb-4'>
+              <img src="/pwa-192x192.png" alt="Combo Star" className='w-10 h-10 rounded-xl' />
+              <h3 className='font-bold text-lg text-gray-800'>{t("install.modal_title")}</h3>
+            </div>
+
+            <div className='flex flex-col gap-3 text-sm text-gray-600'>
+              <div className='flex gap-3 items-start'>
+                <span className='flex items-center justify-center w-6 h-6 rounded-full bg-red-800 text-white text-xs font-bold flex-shrink-0'>1</span>
+                <p>{t("install.step1")}</p>
+              </div>
+              <div className='flex gap-3 items-start'>
+                <span className='flex items-center justify-center w-6 h-6 rounded-full bg-red-800 text-white text-xs font-bold flex-shrink-0'>2</span>
+                <p>{t("install.step2")}</p>
+              </div>
+              <div className='flex gap-3 items-start'>
+                <span className='flex items-center justify-center w-6 h-6 rounded-full bg-red-800 text-white text-xs font-bold flex-shrink-0'>3</span>
+                <p>{t("install.step3")}</p>
+              </div>
+            </div>
+
+            <p className='mt-4 text-xs text-gray-400'>{t("install.note")}</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
