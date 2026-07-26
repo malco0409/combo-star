@@ -9,7 +9,7 @@ export default function CollectionDetail() {
   const { state } = useLocation();
   const navigate  = useNavigate();
   const { addToCart } = useCart();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const product    = state?.product;
   const collection = state?.collection;
@@ -39,7 +39,7 @@ export default function CollectionDetail() {
   const [rateLoading, setRateLoading] = useState(false);
 
   const selectedColorObj = collection?.colors?.[colorIndex] || collection?.colors?.[0];
-  const colorDisplayName = colorLabel(selectedColorObj, t);
+  const colorDisplayName = colorLabel(selectedColorObj, t, i18n.language);
 
   // Rang tanlaganda rasm o'zgaradi
   const displayImage = selectedColorObj?.image || collection?.image;
@@ -147,7 +147,7 @@ export default function CollectionDetail() {
                     className={`rounded-xl border-2 overflow-hidden cursor-pointer transition-all duration-200
                       ${colorIndex === idx ? "border-[#a80000] shadow-md" : "border-gray-100 hover:border-[#a80000]"}`}>
                     {c.image ? (
-                      <img src={c.image} alt={colorLabel(c, t)} className="w-full h-20 object-cover" />
+                      <img src={c.image} alt={colorLabel(c, t, i18n.language)} className="w-full h-20 object-cover" />
                     ) : (
                       <div className="w-full h-20 bg-gray-100 flex items-center justify-center">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -156,7 +156,7 @@ export default function CollectionDetail() {
                       </div>
                     )}
                     <div className={`p-2 text-center text-xs font-medium ${colorIndex === idx ? "text-[#a80000]" : "text-gray-600"}`}>
-                      {colorLabel(c, t)}
+                      {colorLabel(c, t, i18n.language)}
                       {c.price && c.price !== collection.price && (
                         <span className="block text-[#a80000] font-bold">{c.price}</span>
                       )}

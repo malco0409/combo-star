@@ -48,6 +48,7 @@ function buildDefault() {
             id: `${it.id}-c${i}`,
             code: "",
             name: c.name || "",
+            nameRu: "",
             nameKey: c.nameKey || "",
             image: c.image || "",
           })),
@@ -61,6 +62,7 @@ function buildDefault() {
           id: it.id,
           code: "",
           name: it.name || "",
+          nameRu: "",
           nameKey: it.nameKey || "",
           image: it.image || "",
           price: it.price || "",
@@ -102,15 +104,19 @@ export function newItem() {
   return { id: rid("item"), name: "", price: "", image: "", badge: "", badgeColor: "", colors: [] };
 }
 export function newColor() {
-  return { id: rid("clr"), code: "", name: "", nameKey: "", image: "" };
+  return { id: rid("clr"), code: "", name: "", nameRu: "", nameKey: "", image: "" };
 }
 export function newColorOnly() {
-  return { id: rid("clr"), code: "", name: "", nameKey: "", image: "", price: "" };
+  return { id: rid("clr"), code: "", name: "", nameRu: "", nameKey: "", image: "", price: "" };
 }
 
-// Rangni matn sifatida: "13 · mokriy asfalt" yoki shunchaki nom. t — ixtiyoriy tarjima funksiyasi.
-export function colorLabel(c, t) {
+// Rangni matn sifatida: "13 · mokriy asfalt". Tilга qarab nom tanlanadi.
+// t — i18n tarjima funksiyasi (standart ranglar uchun), lang — joriy til ("uz"|"ru").
+export function colorLabel(c, t, lang) {
   if (!c) return "";
-  const nm = c.name || (c.nameKey && t ? t(c.nameKey) : "");
+  let nm;
+  if (c.nameKey && t) nm = t(c.nameKey);                 // standart rang (i18n)
+  else if (lang === "ru" && c.nameRu) nm = c.nameRu;     // ruscha nom (admin qo'shган)
+  else nm = c.name || "";                                 // o'zbekcha nom
   return c.code ? `${c.code} · ${nm}`.trim() : nm;
 }

@@ -7,6 +7,7 @@ import {
   newItem, newColor, newColorOnly,
 } from "../../store/data/collectionStore";
 import { fileToDataURL } from "../utils/image";
+import { translateUzToRu } from "../utils/translate";
 
 const card = { background: "#1a1f2e", border: "1px solid #2d3748", borderRadius: "12px" };
 const text = "#e2e8f0";
@@ -110,6 +111,15 @@ export default function Kolleksiyalar() {
   };
 
   const addItem = () => update({ ...col, items: [...col.items, newItem()] });
+
+  // Rang nomi (o'zbekcha) yozilib bo'lgach — ruscha bo'sh bo'lsa avtomatik tarjima qilamiz.
+  const autoTranslate = async (name, currentRu, setRu) => {
+    if (currentRu) return;                 // qo'lda yozilgan bo'lsa tegmaymiz
+    const clean = (name || "").trim();
+    if (!clean) return;
+    const ru = await translateUzToRu(clean);
+    if (ru) setRu(ru);
+  };
 
   const updateColorIn = (itemId, colorId, patch) =>
     update({
@@ -230,17 +240,26 @@ export default function Kolleksiyalar() {
                   <div key={c.id} className="flex items-center gap-2 p-2 rounded-lg"
                     style={{ background: "#0f1117", border: "1px solid #2d3748" }}>
                     <ImageField value={c.image} onChange={(v) => updateColorIn(it.id, c.id, { image: v })} size={48} />
-                    <div className="grid grid-cols-3 gap-2 flex-1">
-                      <div>
-                        <label className="text-xs block mb-0.5" style={{ color: muted }}>Kod</label>
-                        <input style={inputStyle} placeholder="13" value={c.code}
-                          onChange={(e) => updateColorIn(it.id, c.id, { code: e.target.value })} />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="text-xs block mb-0.5" style={{ color: muted }}>Kod</label>
+                          <input style={inputStyle} placeholder="13" value={c.code}
+                            onChange={(e) => updateColorIn(it.id, c.id, { code: e.target.value })} />
+                        </div>
+                        <div className="col-span-2">
+                          <label className="text-xs block mb-0.5" style={{ color: muted }}>Rang nomi (o'zbekcha)</label>
+                          <input style={inputStyle} placeholder="mokriy asfalt"
+                            value={c.name || (c.nameKey ? t(c.nameKey) : "")}
+                            onChange={(e) => updateColorIn(it.id, c.id, { name: e.target.value, nameKey: "" })}
+                            onBlur={(e) => autoTranslate(e.target.value, c.nameRu, (ru) => updateColorIn(it.id, c.id, { nameRu: ru }))} />
+                        </div>
                       </div>
-                      <div className="col-span-2">
-                        <label className="text-xs block mb-0.5" style={{ color: muted }}>Rang nomi</label>
-                        <input style={inputStyle} placeholder="mokriy asfalt"
-                          value={c.name || (c.nameKey ? t(c.nameKey) : "")}
-                          onChange={(e) => updateColorIn(it.id, c.id, { name: e.target.value, nameKey: "" })} />
+                      <div>
+                        <label className="text-xs block mb-0.5" style={{ color: muted }}>🇷🇺 Ruscha nomi (avtomatik)</label>
+                        <input style={inputStyle} placeholder="русское название"
+                          value={c.nameRu || ""}
+                          onChange={(e) => updateColorIn(it.id, c.id, { nameRu: e.target.value })} />
                       </div>
                     </div>
                     <button onClick={() => deleteColorIn(it.id, c.id)}
@@ -273,22 +292,31 @@ export default function Kolleksiyalar() {
               <div key={c.id} className="flex items-center gap-2 p-2 rounded-lg"
                 style={{ background: "#0f1117", border: "1px solid #2d3748" }}>
                 <ImageField value={c.image} onChange={(v) => updateColorOnly(c.id, { image: v })} size={52} />
-                <div className="grid grid-cols-4 gap-2 flex-1">
-                  <div>
-                    <label className="text-xs block mb-0.5" style={{ color: muted }}>Kod</label>
-                    <input style={inputStyle} placeholder="13" value={c.code}
-                      onChange={(e) => updateColorOnly(c.id, { code: e.target.value })} />
+                <div className="flex-1 space-y-1.5">
+                  <div className="grid grid-cols-4 gap-2">
+                    <div>
+                      <label className="text-xs block mb-0.5" style={{ color: muted }}>Kod</label>
+                      <input style={inputStyle} placeholder="13" value={c.code}
+                        onChange={(e) => updateColorOnly(c.id, { code: e.target.value })} />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="text-xs block mb-0.5" style={{ color: muted }}>Rang nomi (o'zbekcha)</label>
+                      <input style={inputStyle} placeholder="mokriy asfalt"
+                        value={c.name || (c.nameKey ? t(c.nameKey) : "")}
+                        onChange={(e) => updateColorOnly(c.id, { name: e.target.value, nameKey: "" })}
+                        onBlur={(e) => autoTranslate(e.target.value, c.nameRu, (ru) => updateColorOnly(c.id, { nameRu: ru }))} />
+                    </div>
+                    <div>
+                      <label className="text-xs block mb-0.5" style={{ color: muted }}>Narx</label>
+                      <input style={inputStyle} placeholder="$38" value={c.price}
+                        onChange={(e) => updateColorOnly(c.id, { price: e.target.value })} />
+                    </div>
                   </div>
-                  <div className="col-span-2">
-                    <label className="text-xs block mb-0.5" style={{ color: muted }}>Rang nomi</label>
-                    <input style={inputStyle} placeholder="mokriy asfalt"
-                      value={c.name || (c.nameKey ? t(c.nameKey) : "")}
-                      onChange={(e) => updateColorOnly(c.id, { name: e.target.value, nameKey: "" })} />
-                  </div>
                   <div>
-                    <label className="text-xs block mb-0.5" style={{ color: muted }}>Narx</label>
-                    <input style={inputStyle} placeholder="$38" value={c.price}
-                      onChange={(e) => updateColorOnly(c.id, { price: e.target.value })} />
+                    <label className="text-xs block mb-0.5" style={{ color: muted }}>🇷🇺 Ruscha nomi (avtomatik)</label>
+                    <input style={inputStyle} placeholder="русское название"
+                      value={c.nameRu || ""}
+                      onChange={(e) => updateColorOnly(c.id, { nameRu: e.target.value })} />
                   </div>
                 </div>
                 <button onClick={() => deleteColorOnly(c.id)}

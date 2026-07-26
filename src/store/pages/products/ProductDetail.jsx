@@ -5,7 +5,7 @@ import { useCart } from "../../context/CartContext";
 import { useCollection, colorLabel } from "../../data/collectionStore";
 
 export default function ProductDetail() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { state: product } = useLocation();
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -26,7 +26,7 @@ export default function ProductDetail() {
   // Kolleksiya/ranglar CRM ("/admin/kolleksiyalar") orqali boshqariladi — Firestore dan jonli.
   const productCollection = useCollection(productId);
 
-  const label = (c) => colorLabel(c, t);
+  const label = (c) => colorLabel(c, t, i18n.language);
 
   // Birinchi itemdan colors va image olamiz (catalog da colors yo'q)
   const firstItem = useMemo(() => {
