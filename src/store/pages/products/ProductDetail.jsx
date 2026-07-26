@@ -54,10 +54,13 @@ export default function ProductDetail() {
   const rawArea      = hasSize ? (Number(width) * Number(height)) / 10000 : 0;
   // 0.5 m² qadam bilan yuqoriga yaxlitlash:
   // 50x100 = 0.5 m² -> 0.5 m², 50x110 = 0.55 m² -> 1 m²
-  const area         = hasSize ? Math.max(Math.ceil(rawArea / 0.5) * 0.5, 0.5).toFixed(2) : "0.00";
+  const areaNum      = hasSize ? Math.max(Math.ceil(rawArea / 0.5) * 0.5, 0.5) : 0;
+  const area         = hasSize ? areaNum.toFixed(2) : "0.00";
   const price        = parseFloat((product?.price || "0").replace(/[^0-9.]/g, ""));
   const symbol       = (product?.price || "").includes("€") ? "€" : "$";
-  const totalForeign = hasSize ? (price * Number(area) * qty).toFixed(2) : "0.00";
+  // Narx birligi: to'liq m² lar 100%, oxirgi yarim (0.5) m² 70% hisoblanadi
+  const priceUnits   = Math.floor(areaNum) + ((areaNum - Math.floor(areaNum)) >= 0.5 ? 0.7 : 0);
+  const totalForeign = hasSize ? (price * priceUnits * qty).toFixed(2) : "0.00";
 
   const fetchRate = async () => {
     setRateLoading(true);
@@ -79,7 +82,7 @@ export default function ProductDetail() {
   useEffect(() => { fetchRate(); }, []);
 
   const totalUZS = hasSize && rate
-    ? Math.round(price * Number(area) * qty * rate).toLocaleString("uz-UZ")
+    ? Math.round(price * priceUnits * qty * rate).toLocaleString("uz-UZ")
     : null;
 
   const handleAddToCart = () => {
