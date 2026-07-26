@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useProducts, saveProduct, resetProduct } from "../../store/data/productStore";
+import { saveImageData, useResolvedImage } from "../../store/data/remote";
+import Img from "../../store/components/Img";
 import { fileToDataURL } from "../utils/image";
 
 const card = { background: "#1a1f2e", border: "1px solid #2d3748", borderRadius: "12px" };
@@ -47,9 +49,10 @@ export default function Mahsulotlar() {
     setUploading(true);
     try {
       const dataURL = await fileToDataURL(file);
-      setForm((f) => ({ ...f, image: dataURL }));
+      const imgRef = await saveImageData(dataURL);   // alohida hujjatga saqlaymiz
+      setForm((f) => ({ ...f, image: imgRef }));
     } catch {
-      alert("Rasmni o'qishda xatolik.");
+      alert("Rasmni saqlashda xatolik. Internetни tekshiring.");
     }
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
@@ -127,13 +130,10 @@ export default function Mahsulotlar() {
         {products.map((p) => (
           <div key={p.id} style={card} className="overflow-hidden flex flex-col">
             <div className="relative" style={{ height: "150px", background: "#0f1117" }}>
-              {p.image ? (
-                <img src={p.image} alt={nameOf(p)}
-                  className="w-full h-full object-cover"
-                  style={{ opacity: p.hidden ? 0.4 : 1 }} />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-3xl">🪟</div>
-              )}
+              <Img src={p.image} alt={nameOf(p)}
+                className="w-full h-full object-cover"
+                style={{ opacity: p.hidden ? 0.4 : 1 }}
+                fallback={<div className="w-full h-full flex items-center justify-center text-3xl">🪟</div>} />
               <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
                 {p.featured && (
                   <span className="text-xs px-2 py-0.5 rounded-full font-medium"
@@ -195,11 +195,8 @@ export default function Mahsulotlar() {
                 <div className="flex items-center gap-3">
                   <div style={{ width: "80px", height: "80px", borderRadius: "8px", overflow: "hidden", background: "#0f1117", border: "1px solid #2d3748", flexShrink: 0 }}
                     className="flex items-center justify-center">
-                    {form.image ? (
-                      <img src={form.image} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-2xl">🪟</span>
-                    )}
+                    <Img src={form.image} alt="" className="w-full h-full object-cover"
+                      fallback={<span className="text-2xl">🪟</span>} />
                   </div>
                   <div className="flex-1 space-y-2">
                     <button onClick={() => fileRef.current?.click()} disabled={uploading}
@@ -219,7 +216,7 @@ export default function Mahsulotlar() {
                 <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
                 <input style={{ ...inputStyle, marginTop: "8px" }}
                   placeholder="yoki rasm URL manzili (https://...)"
-                  value={form.image?.startsWith("data:") ? "" : form.image}
+                  value={/^(data:|img:)/.test(form.image || "") ? "" : (form.image || "")}
                   onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))} />
               </div>
 

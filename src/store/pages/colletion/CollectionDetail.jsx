@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCart } from "../../context/CartContext";
 import { colorLabel } from "../../data/collectionStore";
+import { useResolvedImage } from "../../data/remote";
+import Img from "../../components/Img";
 
 export default function CollectionDetail() {
   const { state } = useLocation();
@@ -43,6 +45,7 @@ export default function CollectionDetail() {
 
   // Rang tanlaganda rasm o'zgaradi
   const displayImage = selectedColorObj?.image || collection?.image;
+  const heroImage = useResolvedImage(displayImage);
 
   // colors_only da har rangning o'z narxi bor
   const itemPrice = selectedColorObj?.price || collection?.price || "$0";
@@ -118,9 +121,9 @@ export default function CollectionDetail() {
 
           {/* ── Chap ── */}
           <div>
-            {displayImage ? (
+            {heroImage ? (
               <img
-                src={displayImage}
+                src={heroImage}
                 alt={collection.name}
                 className="w-full rounded-2xl object-cover shadow-md transition-all duration-300"
                 style={{ maxHeight: 460 }}
@@ -149,15 +152,14 @@ export default function CollectionDetail() {
                     onClick={() => setColorIndex(idx)}
                     className={`rounded-xl border-2 overflow-hidden cursor-pointer transition-all duration-200
                       ${colorIndex === idx ? "border-[#a80000] shadow-md" : "border-gray-100 hover:border-[#a80000]"}`}>
-                    {c.image ? (
-                      <img src={c.image} alt={colorLabel(c, t, i18n.language)} className="w-full h-20 object-cover" />
-                    ) : (
+                    <Img src={c.image} alt={colorLabel(c, t, i18n.language)} className="w-full h-20 object-cover"
+                      fallback={
                       <div className="w-full h-20 bg-gray-100 flex items-center justify-center">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                           <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
                         </svg>
                       </div>
-                    )}
+                    } />
                     <div className={`p-2 text-center text-xs font-medium ${colorIndex === idx ? "text-[#a80000]" : "text-gray-600"}`}>
                       {colorLabel(c, t, i18n.language)}
                       {c.price && c.price !== collection.price && (

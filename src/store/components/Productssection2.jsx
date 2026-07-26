@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useVisibleProducts } from "../data/productStore";
+import { useResolvedImage } from "../data/remote";
 
 function ProductCard({ img, name, desc, titleKey, descKey, price, index }) {
   const ref = useRef(null);
@@ -25,6 +26,7 @@ function ProductCard({ img, name, desc, titleKey, descKey, price, index }) {
 
   const title = name || t(titleKey);
   const description = desc || t(descKey);
+  const resolvedImg = useResolvedImage(img);
 
   const handleNavigate = () => {
     navigate("/product", {
@@ -54,7 +56,7 @@ function ProductCard({ img, name, desc, titleKey, descKey, price, index }) {
     >
       <div className="overflow-hidden h-60">
         <img
-          src={img}
+          src={resolvedImg}
           alt={title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />

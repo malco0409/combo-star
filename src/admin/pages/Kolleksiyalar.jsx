@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useProducts } from "../../store/data/productStore";
-import { useRemoteReady } from "../../store/data/remote";
+import { useRemoteReady, saveImageData, useResolvedImage } from "../../store/data/remote";
 import {
   useCollection, saveCollection, resetCollection,
   newItem, newColor, newColorOnly,
@@ -18,18 +18,24 @@ const inputStyle = {
   padding: "7px 10px", width: "100%", fontFamily: "inherit",
 };
 
-// Rasmni kompyuterdan (fayldan) tanlash — kichraytirilib dataURL ga saqlanadi.
+// Rasmni kompyuterdan (fayldan) tanlash — kichraytirilib ALOHIDA hujjatga saqlanadi (img:<id> havolasi).
 function ImageField({ value, onChange, size = 60 }) {
   const ref = useRef(null);
   const [busy, setBusy] = useState(false);
+  const url = useResolvedImage(value);   // havolani haqiqiy rasmga aylantiradi
 
   const pick = async (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
     if (!f.type.startsWith("image/")) return alert("Faqat rasm fayli tanlang!");
     setBusy(true);
-    try { onChange(await fileToDataURL(f)); }
-    catch { alert("Rasmni o'qishda xatolik."); }
+    try {
+      const dataURL = await fileToDataURL(f);
+      const imgRef = await saveImageData(dataURL);   // alohida hujjatga saqlaymiz
+      onChange(imgRef);
+    } catch {
+      alert("Rasmni saqlashda xatolik. Internetни tekshiring.");
+    }
     setBusy(false);
     if (ref.current) ref.current.value = "";
   };
@@ -39,9 +45,11 @@ function ImageField({ value, onChange, size = 60 }) {
       <div onClick={() => ref.current?.click()} title="Rasm tanlash"
         className="flex items-center justify-center cursor-pointer"
         style={{ width: size, height: size, borderRadius: 8, overflow: "hidden", background: "#0f1117", border: "1px solid #2d3748" }}>
-        {value
-          ? <img src={value} alt="" className="w-full h-full object-cover" />
-          : <span style={{ color: muted, fontSize: 20 }}>{busy ? "…" : "＋"}</span>}
+        {busy
+          ? <span style={{ color: muted, fontSize: 20 }}>…</span>
+          : url
+            ? <img src={url} alt="" className="w-full h-full object-cover" />
+            : <span style={{ color: muted, fontSize: 20 }}>＋</span>}
       </div>
       {value
         ? <button onClick={() => onChange("")} style={{ color: "#f87171", fontSize: 10 }}>o'chirish</button>

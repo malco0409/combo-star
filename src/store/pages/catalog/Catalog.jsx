@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useVisibleProducts } from "../../data/productStore";
+import Img from "../../components/Img";
 
 // Mahsulotlar CRM ("/admin/mahsulotlar") orqali boshqariladi — Firestore dan jonli o'qiladi.
 export default function Catalog() {
@@ -131,13 +132,14 @@ export default function Catalog() {
                              hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                 >
                   <div className="relative overflow-hidden">
-                    <img
+                    <Img
                       src={product.image}
                       alt={title}
                       loading="lazy"
                       className="w-full h-56 sm:h-64 object-cover cursor-pointer
                                  group-hover:scale-105 transition-transform duration-500"
                       onClick={() => goToProduct(product)}
+                      fallback={<div className="w-full h-56 sm:h-64 bg-gray-100 flex items-center justify-center text-4xl cursor-pointer" onClick={() => goToProduct(product)}>🪟</div>}
                     />
                     <div className="absolute top-4 right-4 bg-[#780202] text-white rounded-xl
                                     px-3 py-2 text-center leading-tight shadow-lg">

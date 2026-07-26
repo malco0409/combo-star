@@ -6,10 +6,10 @@
 //
 // Storefront va CRM shu kesh orqali o'qiydi (sinxron), yozish esa Firestore ga (asinxron) boradi.
 // React komponentlari useSyncExternalStore orqali jonli yangilanadi.
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore, useState, useEffect } from "react";
 import { db } from "../../firebase";
 import {
-  collection, doc, onSnapshot, setDoc, deleteDoc,
+  collection, doc, onSnapshot, setDoc, deleteDoc, getDoc,
 } from "firebase/firestore";
 
 const COL_PRODUCTS = "products";
@@ -85,6 +85,54 @@ export function getProductOverrides() {
 }
 export function getCollectionData(id) {
   return collectionsData[id] || null;
+}
+
+// ── Rasmlar (har biri alohida hujjatда — 1MB chekloviga tushmasligi uchun) ──
+// images/{id} = { data: "<dataURL>" }. Boshqa hujjatlar faqat "img:<id>" havolasini saqlaydi.
+const IMAGES = "images";
+const imageCache = new Map();   // id -> dataURL (qayta yuklamaslik uchun)
+
+function imgId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// Rasmni (dataURL) alohida hujjatga saqlaydi, "img:<id>" havolasini qaytaradi.
+export async function saveImageData(dataURL) {
+  const id = imgId();
+  await setDoc(doc(db, IMAGES, id), { data: dataURL });
+  imageCache.set(id, dataURL);
+  return `img:${id}`;
+}
+
+// Havolani haqiqiy rasmga aylantiradi. "img:" bo'lmasa (eski dataURL yoki oddiy URL) — o'zini qaytaradi.
+export async function resolveImage(ref) {
+  if (!ref || typeof ref !== "string") return "";
+  if (!ref.startsWith("img:")) return ref;
+  const id = ref.slice(4);
+  if (imageCache.has(id)) return imageCache.get(id);
+  try {
+    const snap = await getDoc(doc(db, IMAGES, id));
+    const data = snap.exists() ? (snap.data().data || "") : "";
+    imageCache.set(id, data);
+    return data;
+  } catch {
+    return "";
+  }
+}
+
+// Rasm havolasini komponentда ishlatish uchun hook (yuklangач rasmni qaytaradi).
+export function useResolvedImage(ref) {
+  const [url, setUrl] = useState(() =>
+    ref && !String(ref).startsWith("img:") ? ref : ""
+  );
+  useEffect(() => {
+    let alive = true;
+    if (!ref) { setUrl(""); return; }
+    if (!String(ref).startsWith("img:")) { setUrl(ref); return; }
+    resolveImage(ref).then((u) => { if (alive) setUrl(u); });
+    return () => { alive = false; };
+  }, [ref]);
+  return url;
 }
 
 // ── Sozlamalar (settings) ──

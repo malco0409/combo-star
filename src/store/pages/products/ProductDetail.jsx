@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCart } from "../../context/CartContext";
 import { useCollection, colorLabel } from "../../data/collectionStore";
+import { useResolvedImage } from "../../data/remote";
+import Img from "../../components/Img";
 
 export default function ProductDetail() {
   const { t, i18n } = useTranslation();
@@ -46,6 +48,7 @@ export default function ProductDetail() {
   const selectedColorObj = productColors[selectedColorIndex] || null;
   const color = selectedColorObj ? label(selectedColorObj) : "";
   const displayImage = selectedColorObj?.image || product?.image;
+  const heroImage = useResolvedImage(displayImage);
 
   const displayTitle = product?.titleKey ? t(product.titleKey) : product?.title;
   const displayDesc  = product?.descKey  ? t(product.descKey)  : product?.description;
@@ -133,7 +136,7 @@ export default function ProductDetail() {
           {/* ── Chap ── */}
           <div>
             <img
-              src={displayImage}
+              src={heroImage}
               alt={displayTitle}
               className="w-full rounded-2xl object-cover shadow-md transition-all duration-300"
               style={{ maxHeight: 460 }}
@@ -328,15 +331,14 @@ export default function ProductDetail() {
                   <div key={item.id}
                     onClick={() => navigate("/collection", { state: { product, collection: { ...item, colors: productCollection.items.map(i => ({ id: i.id, code: i.code, name: i.name, nameKey: i.nameKey, image: i.image, price: i.price })) }, selectedColorId: item.id } })}
                     className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md hover:border-[#a80000] transition-all duration-300 cursor-pointer group">
-                    {item.image ? (
-                      <img src={item.image} alt={label(item)} className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
+                    <Img src={item.image} alt={label(item)} className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                      fallback={
                       <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                           <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
                         </svg>
                       </div>
-                    )}
+                    } />
                     <div className="p-3">
                       <p className="font-semibold text-gray-900 text-sm group-hover:text-[#a80000] transition-colors">
                         {label(item)}
@@ -356,11 +358,11 @@ export default function ProductDetail() {
                     className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-all duration-300">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
-                        {col.image ? <img src={col.image} alt={col.name} className="w-full h-full object-cover" /> : (
+                        <Img src={col.image} alt={col.name} className="w-full h-full object-cover" fallback={
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
                           </svg>
-                        )}
+                        } />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -380,15 +382,14 @@ export default function ProductDetail() {
                         <div key={c.id || c.code || ci}
                           onClick={() => navigate("/collection", { state: { product, collection: col, selectedColor: c.name, selectedColorId: c.id } })}
                           className="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-[#a80000] transition-all duration-300 cursor-pointer group">
-                          {c.image ? (
-                            <img src={c.image} alt={label(c)} className="w-full h-20 object-cover group-hover:scale-105 transition-transform duration-300" />
-                          ) : (
+                          <Img src={c.image} alt={label(c)} className="w-full h-20 object-cover group-hover:scale-105 transition-transform duration-300"
+                            fallback={
                             <div className="w-full h-20 bg-gray-100 flex items-center justify-center">
                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                 <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
                               </svg>
                             </div>
-                          )}
+                          } />
                           <div className="p-2">
                             <p className="text-xs font-medium text-gray-700 group-hover:text-[#a80000] transition-colors text-center">
                               {label(c)}
