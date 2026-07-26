@@ -195,8 +195,8 @@ export default function ProductDetail() {
             <div>
               <label className="text-gray-700 text-sm font-medium mb-1 block">{t("product.width")}</label>
               <input type="number" value={width} placeholder="120"
-                onChange={(e) => { const v = e.target.value; if (v === "") return setWidth(""); if (Number(v) >= 0) setWidth(String(Math.min(Number(v), 300))); }}
-                onFocus={(e) => e.target.select()} min={30} max={300}
+                onChange={(e) => { const v = e.target.value; if (v === "") return setWidth(""); if (Number(v) >= 0) setWidth(v); }}
+                onFocus={(e) => e.target.select()} min={0}
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#a80000] transition bg-gray-50"
               />
               <p className="text-gray-400 text-xs mt-1">{t("product.min_max")}</p>
@@ -206,8 +206,8 @@ export default function ProductDetail() {
             <div>
               <label className="text-gray-700 text-sm font-medium mb-1 block">{t("product.height")}</label>
               <input type="number" value={height} placeholder="150"
-                onChange={(e) => { const v = e.target.value; if (v === "") return setHeight(""); if (Number(v) >= 0) setHeight(String(Math.min(Number(v), 300))); }}
-                onFocus={(e) => e.target.select()} min={30} max={300}
+                onChange={(e) => { const v = e.target.value; if (v === "") return setHeight(""); if (Number(v) >= 0) setHeight(v); }}
+                onFocus={(e) => e.target.select()} min={0}
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-[#a80000] transition bg-gray-50"
               />
               <p className="text-gray-400 text-xs mt-1">{t("product.min_max")}</p>
