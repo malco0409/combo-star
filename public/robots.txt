@@ -3,4 +3,4 @@ Allow: /
 Disallow: /cart
 Disallow: /orders
 
-Sitemap: https://combostar.com.uz/sitemap.xml
+Sitemap: https://www.combostar.com.uz/sitemap.xml
