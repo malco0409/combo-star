@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getOrders, getClients, getCollections } from "../data/store";
 
 const card = { background: "#1a1f2e", border: "1px solid #2d3748", borderRadius: "12px" };
@@ -6,15 +6,10 @@ const muted = "#64748b";
 const text = "#e2e8f0";
 
 export default function Dashboard() {
-  const [orders, setOrders] = useState([]);
-  const [clients, setClients] = useState([]);
-  const [cols, setCols] = useState([]);
-
-  useEffect(() => {
-    setOrders(getOrders());
-    setClients(getClients());
-    setCols(getCollections());
-  }, []);
+  // localStorage'dan bir marta o'qiymiz (effekt orqali emas — ortiqcha render bo'lmasin)
+  const [orders] = useState(getOrders);
+  const [clients] = useState(getClients);
+  const [cols] = useState(getCollections);
 
   const revenue = orders
     .filter((o) => o.pay === "To'langan")

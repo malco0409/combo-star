@@ -10,6 +10,7 @@ import Mijozlar from "./pages/Mijozlar";
 import Ombor from "./pages/Ombor";
 import Mahsulotlar from "./pages/Mahsulotlar";
 import Kolleksiyalar from "./pages/Kolleksiyalar";
+import Ishlarimiz from "./pages/Ishlarimiz";
 import Sozlamalar from "./pages/Sozlamalar";
 import AttendancePage from "./pages/attendance/AttendancePage";
 import AdminAttendancePage from "./pages/attendance/AdminAttendancePage";
@@ -73,6 +74,11 @@ export default function AdminApp() {
           <Route path="kolleksiyalar" element={
             role === "admin"
               ? <Kolleksiyalar />
+              : <Navigate to="/admin/dashboard" replace />
+          } />
+          <Route path="ishlarimiz" element={
+            role === "admin"
+              ? <Ishlarimiz />
               : <Navigate to="/admin/dashboard" replace />
           } />
           <Route path="sozlamalar" element={

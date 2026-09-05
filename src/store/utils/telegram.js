@@ -52,6 +52,31 @@ function normalizeColor(color) {
   return colorMap[color] || color;
 }
 
+// Telegram "Markdown" rejimida `_ * [ ` belgilari formatlash sifatida o'qiladi.
+// Mijoz ismida shunday belgi bo'lsa Telegram butun xabarni rad etadi (400) va
+// buyurtma yo'qoladi — shuning uchun foydalanuvchi matnidan ularni olib tashlaymiz.
+function safe(value) {
+  return String(value ?? "").replace(/[_*[\]`]/g, "").trim();
+}
+
+// Telegram xatolikni HTTP 400 bilan qaytaradi — fetch bunda o'zi xato bermaydi.
+// Shuning uchun javobni tekshiramiz, aks holda "yuborildi" deb yolg'on ko'rsatiladi.
+async function callTelegram(method, payload) {
+  if (!BOT_TOKEN) throw new Error("Telegram bot token sozlanmagan (VITE_TELEGRAM_BOT_TOKEN)");
+
+  const res  = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok || !data?.ok) {
+    throw new Error(`Telegram ${method}: ${data?.description || res.status}`);
+  }
+  return data.result;
+}
+
 // "Ролло жалюзи — Eron" => "Rollo jalyuzi — Eron"
 function normalizeTitle(title) {
   // " — " bilan ajratilgan format (CollectionDetail dan keladi)
@@ -74,11 +99,11 @@ export async function sendToTelegram(items, customer = {}, orderId) {
       : "\u2014";
 
     return `
-${i + 1}. \u{1F4E6} *${normalizeTitle(item.product.title)}*
+${i + 1}. \u{1F4E6} *${safe(normalizeTitle(item.product.title))}*
    \u{1F4D0} O'lcham: ${item.width} \u00d7 ${item.height} sm
    \u{1F4CF} Maydon: ${item.area} m\u00b2
    \u{1F522} Miqdor: ${item.qty} dona
-   \u{1F3A8} Rang: ${normalizeColor(item.color)}
+   \u{1F3A8} Rang: ${safe(normalizeColor(item.color))}
    \u{1F4B0} Narx: ${item.symbol}${totalPrice}
    \u{1F4B5} So'mda: ${totalUZS} so'm`;
   }).join("\n");
@@ -92,8 +117,8 @@ ${i + 1}. \u{1F4E6} *${normalizeTitle(item.product.title)}*
   const text = `\u{1F6D2} *Yangi buyurtma!*
 \u{1F194} *Zakaz ID:* \`${orderId}\`
 
-\u{1F464} *Mijoz:* ${customer.name || "\u2014"}
-\u{1F4DE} *Telefon:* ${customer.phone || "\u2014"}
+\u{1F464} *Mijoz:* ${safe(customer.name) || "\u2014"}
+\u{1F4DE} *Telefon:* ${safe(customer.phone) || "\u2014"}
 
 ${itemsText}
 
@@ -101,36 +126,29 @@ ${itemsText}
 \u2705 *Jami ${items.length} ta mahsulot*
 \u{1F4B0} *Umumiy narx: ${symbol}${grandTotal}*`;
 
-  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: CHAT_ID,
-      text,
-      parse_mode: "Markdown",
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: "\u{1F680} Boshlash", callback_data: `start_${orderId}` }],
-        ],
-      },
-    }),
+  await callTelegram("sendMessage", {
+    chat_id: CHAT_ID,
+    text,
+    parse_mode: "Markdown",
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "\u{1F680} Boshlash", callback_data: `start_${orderId}` }],
+      ],
+    },
   });
 }
 
+// Aloqa formasi: "email" maydoniga aslida telefon raqam kiritiladi (Contact.jsx).
 export async function sendContactToTelegram({ name, email, message }) {
   const text = `\u{1F4E9} *Yangi xabar!*
 
-\u{1F464} *Ism:* ${name}
-\u{1F4E7} *Email:* ${email}
-\u{1F4AC} *Xabar:* ${message || "\u2014"}`;
+\u{1F464} *Ism:* ${safe(name) || "\u2014"}
+\u{1F4DE} *Telefon:* ${safe(email) || "\u2014"}
+\u{1F4AC} *Xabar:* ${safe(message) || "\u2014"}`;
 
-  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: PERSONAL_CHAT_ID,
-      text,
-      parse_mode: "Markdown",
-    }),
+  await callTelegram("sendMessage", {
+    chat_id: PERSONAL_CHAT_ID,
+    text,
+    parse_mode: "Markdown",
   });
 }

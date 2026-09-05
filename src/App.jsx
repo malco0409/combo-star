@@ -1,5 +1,5 @@
 // App.jsx — yagona router: storefront ("/") + CRM ("/admin")
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 
 // ── Storefront ──
@@ -17,9 +17,11 @@ import ProjectDetail from "./store/pages/project/ProjectDetail";
 import MeasuringPage from "./store/pages/measuring/MeasuringPage";
 import OrdersPage from "./store/pages/orders/OrdersPage";
 import CollectionDetail from "./store/pages/colletion/CollectionDetail";
+import NotFound from "./store/pages/NotFound";
 
 // ── CRM (admin) ──
-import AdminApp from "./admin/AdminApp";
+// Alohida bo'lakka ajratilgan: sayt mijozlari CRM kodini yuklab olmaydi.
+const AdminApp = lazy(() => import("./admin/AdminApp"));
 
 function StoreLayout() {
   return (
@@ -61,10 +63,19 @@ export default function App() {
           <Route path="/measuring" element={<MeasuringPage />} />
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/collection" element={<CollectionDetail />} />
+          {/* Noma'lum manzil — bo'sh sahifa o'rniga 404 */}
+          <Route path="*" element={<NotFound />} />
         </Route>
 
         {/* CRM — alohida login bilan */}
-        <Route path="/admin/*" element={<AdminApp />} />
+        <Route
+          path="/admin/*"
+          element={
+            <Suspense fallback={<div style={{ minHeight: "100vh", background: "#0f1117" }} />}>
+              <AdminApp />
+            </Suspense>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

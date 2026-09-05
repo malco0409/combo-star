@@ -5,6 +5,10 @@ import { pushOrdersToCrm } from "../../shared/orderBridge";
 
 const CartContext = createContext();
 
+// Oxirgi status — bunga yetgan buyurtmani kuzatishning hojati yo'q
+// (telegramPolling.js dagi "finish"/"ready" bilan bir xil bo'lishi shart).
+const DONE_STATUS = "Zakaz tayyor! 🎉";
+
 export function CartProvider({ children }) {
   const [cart, setCart] = useState(() => {
     try {
@@ -28,8 +32,11 @@ export function CartProvider({ children }) {
     localStorage.setItem("orders", JSON.stringify(orders));
   }, [orders]);
 
+  // cartId noyob bo'lishi shart — bir soniyada ikkita qo'shilsa Date.now() takrorlanadi
+  // va o'chirishda ikkalasi birdan o'chib ketardi.
   const addToCart = (item) => {
-    setCart((prev) => [...prev, { ...item, cartId: Date.now() }]);
+    const cartId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    setCart((prev) => [...prev, { ...item, cartId }]);
   };
 
   const removeFromCart = (cartId) => {
@@ -49,8 +56,9 @@ export function CartProvider({ children }) {
     localStorage.removeItem("cart");
   };
 
-  const addOrder = (items, customer) => {
-    const orderId = Date.now();
+  // orderId tashqaridan beriladi: CartPage avval Telegram'ga yuboradi,
+  // yuborilgach shu id bilan buyurtmani yozib qo'yadi.
+  const addOrder = (items, customer, orderId = Date.now()) => {
     const order = {
       id: orderId,
       date: new Date().toLocaleString("uz-UZ"),
@@ -80,12 +88,28 @@ export function CartProvider({ children }) {
     setOrders((prev) => prev.filter((order) => order.id !== orderId));
   };
 
+  // Telegram'dagi "Boshlash / Tugatish" tugmalarini kuzatish.
+  // MUHIM: avval bu har bir tashrifchida (hatto CRM'da ham) 5 soniyada bir marta
+  // ishlab turardi — behuda trafik va batareya. Endi faqat mijozning tugallanmagan
+  // buyurtmasi bo'lsa so'raymiz va sahifa ko'rinmayotgan bo'lsa to'xtatamiz.
+  // Cheklov: getUpdates bitta "iste'molchi" uchun mo'ljallangan — bir vaqtda bir
+  // nechta mijoz kuzatsa, yangilanishni faqat bittasi oladi. To'liq yechim: backend/webhook.
+  const hasPendingOrders = orders.some((o) => o.status !== DONE_STATUS);
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      pollTelegramUpdates(updateOrderStatus);
-    }, 5000);
+    if (!hasPendingOrders) return;
+
+    let busy = false;
+    const tick = async () => {
+      if (busy || document.hidden) return;
+      busy = true;
+      try { await pollTelegramUpdates(updateOrderStatus); } finally { busy = false; }
+    };
+
+    tick();
+    const interval = setInterval(tick, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [hasPendingOrders]);
 
   return (
     <CartContext.Provider value={{
@@ -97,4 +121,5 @@ export function CartProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => useContext(CartContext);

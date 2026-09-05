@@ -1,85 +1,21 @@
 // src/pages/about/About.jsx
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
-// Har bir loyiha uchun bir nechta rasm
-const projectGalleries = {
-  1: [
-    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&q=80",
-    "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80",
-    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80",
-    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
-    "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80",
-    "https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?w=800&q=80",
-    "https://images.unsplash.com/photo-1600508774634-4e11d34730e2?w=800&q=80",
-  ],
-  2: [
-    "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80",
-    "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80",
-    "https://images.unsplash.com/photo-1460317442991-0ec209397118?w=800&q=80",
-    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
-    "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=800&q=80",
-    "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80",
-    "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80",
-  ],
-  3: [
-    "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
-    "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80",
-    "https://images.unsplash.com/photo-1567016432779-094069958ea5?w=800&q=80",
-    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
-    "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
-    "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&q=80",
-    "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=800&q=80",
-    "https://images.unsplash.com/photo-1549187774-b4e9b0445b41?w=800&q=80",
-  ],
-  4: [
-    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
-    "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80",
-    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&q=80",
-    "https://images.unsplash.com/photo-1604328698692-f76ea9498e76?w=800&q=80",
-    "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80",
-    "https://images.unsplash.com/photo-1577412647305-991150c7d163?w=800&q=80",
-  ],
-  5: [
-    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
-    "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=800&q=80",
-    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
-    "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80",
-    "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&q=80",
-    "https://images.unsplash.com/photo-1416331108676-a22ccb276e35?w=800&q=80",
-    "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
-  ],
-  6: [
-    "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80",
-    "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800&q=80",
-    "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80",
-    "https://images.unsplash.com/photo-1566195992011-5f6b21e539aa?w=800&q=80",
-    "https://images.unsplash.com/photo-1587985064135-0366536eab42?w=800&q=80",
-    "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800&q=80",
-    "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=800&q=80",
-  ],
-};
-
-// Cover rasmlari (kartochkada ko'rinadigan birinchi rasm)
-const projectCovers = {
-  1: projectGalleries[1][0],
-  2: projectGalleries[2][0],
-  3: projectGalleries[3][0],
-  4: projectGalleries[4][0],
-  5: projectGalleries[5][0],
-  6: projectGalleries[6][0],
-};
+import Img from "../../components/Img";
+import { useWorks, workTitle, workDesc } from "../../data/worksStore";
 
 export default function About() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language || "uz";
 
-  const projects = [1, 2, 3, 4, 5, 6].map((id) => ({
-    id,
-    image: projectCovers[id],
-    title: t(`about.projects.${id}.title`),
-    description: t(`about.projects.${id}.description`),
-    images: projectGalleries[id],
+  // Ishlar (loyihalar) — admin panelidan boshqariladi
+  const projects = useWorks().map((w) => ({
+    id: w.id,
+    image: w.images[0] || "",
+    title: workTitle(w, t, lang),
+    description: workDesc(w, t, lang),
+    images: w.images,
   }));
 
   return (
@@ -181,7 +117,7 @@ export default function About() {
       </section>
 
       {/* ───── Projects ───── */}
-      <section className="w-full py-16 px-4 sm:px-6 lg:px-8"
+      <section className="light-surface w-full py-16 px-4 sm:px-6 lg:px-8"
         style={{ background: "linear-gradient(180deg, #f8f8f8 0%, #ffffff 100%)" }}
       >
         <div className="max-w-7xl mx-auto">
@@ -203,11 +139,16 @@ export default function About() {
                            hover:shadow-xl transition-shadow duration-300 group"
               >
                 <div className="relative overflow-hidden">
-                  <img
+                  <Img
                     src={project.image}
                     alt={project.title}
                     className="w-full h-56 sm:h-64 object-cover
                                transition-transform duration-500 group-hover:scale-105"
+                    fallback={
+                      <div className="w-full h-56 sm:h-64 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+                        🖼️
+                      </div>
+                    }
                   />
                   <div
                     className="absolute inset-0 flex flex-col items-center justify-center

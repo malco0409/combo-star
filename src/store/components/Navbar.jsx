@@ -1,27 +1,30 @@
 import React from 'react'
 import { IoIosStarHalf } from "react-icons/io";
+import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Cart from "./Cart";
 import comboLogo from "../assets/combologo.png";
+import { getTheme, setTheme, clearTheme } from "../utils/theme";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setThemeState] = useState(getTheme);
   const { t, i18n } = useTranslation();
   const activeLang = (i18n.language || "uz").toUpperCase();
 
-  // Saqlangan tilni tiklash
-  useEffect(() => {
-    const saved = localStorage.getItem("lang");
-    if (saved && saved !== i18n.language) i18n.changeLanguage(saved);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Qorong'i rejim — faqat saytda. Tanlov localStorage'da saqlanadi.
+  useEffect(() => { setTheme(theme); }, [theme]);
+  // CRM ("/admin") ga o'tilganda Navbar yo'qoladi — sayt mavzusi ham olinadi.
+  useEffect(() => clearTheme, []);
+
+  const toggleTheme = () => setThemeState((prev) => (prev === "dark" ? "light" : "dark"));
 
   const changeLang = (lang) => {
     const code = lang.toLowerCase();
     i18n.changeLanguage(code);
-    localStorage.setItem("lang", code);
+    try { localStorage.setItem("lang", code); } catch { /* private rejim */ }
   };
 
   const links = [
@@ -83,6 +86,18 @@ function Navbar() {
               </button>
             ))}
           </div>
+
+          {/* Qorong'i / yorug' rejim */}
+          <button
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? t("theme.light") : t("theme.dark")}
+            title={theme === "dark" ? t("theme.light") : t("theme.dark")}
+            className='theme-toggle p-2.5 rounded-xl bg-gray-100 text-gray-600 cursor-pointer
+                       hover:bg-white hover:text-red-800 hover:shadow-sm
+                       transition-all duration-300 ease-in-out'
+          >
+            {theme === "dark" ? <IoSunnyOutline size={18} /> : <IoMoonOutline size={18} />}
+          </button>
 
           {/* Cart */}
           <Cart />

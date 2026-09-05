@@ -5,7 +5,23 @@
     <link rel="icon" type="image/png" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/favicon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Qorong'i rejim: tanlangan mavzuni sahifa chizilishidan OLDIN qo'yamiz,
+         shunda qora mavzuda ham oq "lipillash" (flash) bo'lmaydi.
+         Mantiq: src/store/utils/theme.js — o'zgartirilsa, ikkalasi mos bo'lsin. -->
+    <script>
+      (function () {
+        try {
+          if (location.pathname.indexOf("/admin") === 0) return;   // CRM o'z mavzusiga ega
+          if (localStorage.getItem("storeTheme") === "dark") {
+            document.documentElement.classList.add("dark-mode");
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", "#0d0d10");
+          }
+        } catch (e) { /* localStorage yopiq bo'lishi mumkin */ }
+      })();
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Nunito:wght@400;600;700&family=Outfit:wght@700;900&display=swap" rel="stylesheet">
 
     <!-- SEO -->
     <title>Jalyuzi Toshkent — Combo Star | Жалюзи, москитные сетки в Ташкенте</title>

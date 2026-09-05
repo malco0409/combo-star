@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCart } from "../../context/CartContext";
 import { sendToTelegram } from "../../utils/telegram";
+import Img from "../../components/Img";
 
 export default function CartPage() {
   const { cart, removeFromCart, clearCart, updateQty, addOrder } = useCart();
@@ -15,6 +16,7 @@ export default function CartPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm]         = useState({ name: "", phone: "" });
   const [errors, setErrors]     = useState({ name: "", phone: "" });
+  const [sendError, setSendError] = useState("");
 
   const totalForeignSum = cart
     .reduce((sum, item) => sum + parseFloat(item.totalForeign) * item.qty, 0)
@@ -37,15 +39,20 @@ export default function CartPage() {
   const handleOrder = async () => {
     if (!validate()) return;
     setLoading(true);
+    setSendError("");
     try {
-      const orderId = addOrder(cart, form);
+      // Avval Telegram'ga yuboramiz: yuborilmasa buyurtma yozilmaydi va
+      // savat tozalanmaydi — mijoz qayta urinib ko'ra oladi.
+      const orderId = Date.now();
       await sendToTelegram(cart, form, orderId);
+      addOrder(cart, form, orderId);
       setSent(true);
       clearCart();
       setModalOpen(false);
       setTimeout(() => setSent(false), 3000);
     } catch (e) {
-      console.error(e);
+      console.error("Buyurtma yuborilmadi:", e);
+      setSendError(t("cart.err_send"));
     } finally {
       setLoading(false);
     }
@@ -120,7 +127,13 @@ export default function CartPage() {
 
             {cart.map((item) => (
               <div key={item.cartId} className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 flex gap-4 items-center">
-                <img src={item.product.image} alt={item.product.title} className="w-24 h-24 rounded-xl object-cover flex-shrink-0" />
+                {/* Admin yuklagan rasm "img:<id>" havolasi bo'lishi mumkin — <Img> uni yechadi */}
+                <Img
+                  src={item.product.image}
+                  alt={item.product.title}
+                  className="w-24 h-24 rounded-xl object-cover flex-shrink-0"
+                  fallback={<div className="w-24 h-24 rounded-xl bg-gray-100 flex-shrink-0" />}
+                />
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-gray-900 text-base mb-1">{item.product.title}</p>
                   <p className="text-gray-500 text-sm">{t("product.size_label")}: {item.width} × {item.height} cm</p>
@@ -250,6 +263,18 @@ export default function CartPage() {
                 {t("cart.order_notice")}
               </p>
             </div>
+
+            {/* Yuborishdagi xatolik */}
+            {sendError && (
+              <div className="mb-4 flex items-start gap-2 bg-red-50 border border-red-200 text-red-800 rounded-2xl px-4 py-3 text-xs leading-relaxed font-medium">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="13" />
+                  <line x1="12" y1="16" x2="12" y2="16" strokeWidth="2.5" />
+                </svg>
+                {sendError}
+              </div>
+            )}
 
             {/* Tasdiqlash tugmasi */}
             <button onClick={handleOrder} disabled={loading}

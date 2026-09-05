@@ -120,19 +120,47 @@ export async function resolveImage(ref) {
   }
 }
 
-// Rasm havolasini komponentда ishlatish uchun hook (yuklangач rasmni qaytaradi).
+// Keshda turgan rasmni sinxron olish (qayta yuklamasdan darhol ko'rsatish uchun).
+function cachedImage(ref) {
+  if (!ref || !ref.startsWith("img:")) return ref || "";
+  return imageCache.get(ref.slice(4)) || "";
+}
+
+// Rasm havolasini komponentda ishlatish uchun hook (yuklangach rasmni qaytaradi).
 export function useResolvedImage(ref) {
-  const [url, setUrl] = useState(() =>
-    ref && !String(ref).startsWith("img:") ? ref : ""
-  );
+  const key = ref ? String(ref) : "";
+  const isRef = key.startsWith("img:");
+  const [resolved, setResolved] = useState({ key: "", url: "" });
+
   useEffect(() => {
+    if (!isRef) return;
     let alive = true;
-    if (!ref) { setUrl(""); return; }
-    if (!String(ref).startsWith("img:")) { setUrl(ref); return; }
-    resolveImage(ref).then((u) => { if (alive) setUrl(u); });
+    resolveImage(key).then((u) => { if (alive) setResolved({ key, url: u }); });
     return () => { alive = false; };
-  }, [ref]);
-  return url;
+  }, [key, isRef]);
+
+  if (!isRef) return key;                                 // oddiy URL / dataURL
+  if (resolved.key === key) return resolved.url;          // yuklangan
+  return cachedImage(key);                                // keshda bo'lsa darhol, bo'lmasa ""
+}
+
+// Bir nechta rasm havolasini birdaniga yechadigan hook (galereyalar uchun).
+export function useResolvedImages(refs) {
+  const key = Array.isArray(refs) ? refs.join("|") : "";
+  const [resolved, setResolved] = useState({ key: "", urls: [] });
+
+  useEffect(() => {
+    if (!key) return;
+    let alive = true;
+    Promise.all(key.split("|").map(resolveImage))
+      .then((urls) => { if (alive) setResolved({ key, urls }); });
+    return () => { alive = false; };
+  }, [key]);
+
+  if (!key) return [];
+  if (resolved.key === key) return resolved.urls;
+  // Hali yechilmagan: oddiy URL va keshdagi rasmlar darhol, qolgani yuklangach almashadi
+  return key.split("|").map(cachedImage);
 }
 
 // ── Sozlamalar (settings) ──

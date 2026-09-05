@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSetting, saveSetting, parseVideo } from "../../store/data/settingsStore";
 
 const card = { background: "#1a1f2e", border: "1px solid #2d3748", borderRadius: "12px" };
@@ -12,12 +12,13 @@ const inputStyle = {
 
 export default function Sozlamalar() {
   const savedVideo = useSetting("measuringVideo");
-  const [video, setVideo] = useState("");
+  // draft === null bo'lsa Firestore dagi qiymat ko'rsatiladi; yozila boshlangach — draft.
+  const [draft, setDraft] = useState(null);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
 
-  // Firestore dan kelgan qiymatni bir marta inputga joylaymiz
-  useEffect(() => { setVideo(savedVideo || ""); }, [savedVideo]);
+  const video = draft === null ? (savedVideo || "") : draft;
+  const setVideo = setDraft;
 
   const preview = parseVideo(video);
 

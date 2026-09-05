@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getClients, saveClients, genId } from "../data/store";
 
 const card = { background: "#1a1f2e", border: "1px solid #2d3748", borderRadius: "12px" };
@@ -13,12 +13,10 @@ const inputStyle = {
 const EMPTY = { name: "", phone: "", address: "", note: "" };
 
 export default function Mijozlar() {
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState(getClients);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(EMPTY);
-
-  useEffect(() => { setClients(getClients()); }, []);
 
   const update = (data) => { setClients(data); saveClients(data); };
 

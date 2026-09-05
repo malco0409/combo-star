@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getOrders, saveOrders, getCollections, genId } from "../data/store";
 import { PRODUCTS } from "./Ombor";
 
@@ -30,19 +30,14 @@ const EMPTY = {
 };
 
 export default function Buyurtmalar() {
-  const [orders, setOrders] = useState([]);
-  const [cols, setCols] = useState([]);
+  const [orders, setOrders] = useState(getOrders);
+  const [cols] = useState(getCollections);
   const [expanded, setExpanded] = useState(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterPay, setFilterPay] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(EMPTY);
-
-  useEffect(() => {
-    setOrders(getOrders());
-    setCols(getCollections());
-  }, []);
 
   const update = (data) => { setOrders(data); saveOrders(data); };
 

@@ -7,6 +7,7 @@ const links = [
   { to: "/admin/mijozlar",      icon: "👥", label: "Mijozlar",         roles: ["admin", "operator"] },
   { to: "/admin/mahsulotlar",   icon: "🛍️", label: "Mahsulotlar",      roles: ["admin"] },
   { to: "/admin/kolleksiyalar", icon: "🎨", label: "Kolleksiya/Ranglar", roles: ["admin"] },
+  { to: "/admin/ishlarimiz",    icon: "🖼️", label: "Bizning ishlarimiz", roles: ["admin"] },
   { to: "/admin/sozlamalar",    icon: "🎬", label: "Sozlamalar (video)", roles: ["admin"] },
   { to: "/admin/ombor",         icon: "🏭", label: "Omborxona",        roles: ["admin"] },
   { to: "/admin/davomat",       icon: "🕐", label: "Davomat",          roles: ["admin", "ishchi"] },

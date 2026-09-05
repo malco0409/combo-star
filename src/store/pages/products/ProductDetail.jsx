@@ -38,11 +38,8 @@ export default function ProductDetail() {
   }, [productCollection]);
 
   // product.colors bo'lsa ishlatamiz, bo'lmasa firstItem.colors dan olamiz
-  const productColors = useMemo(() => {
-    if (product?.colors && product.colors.length > 0) return product.colors;
-    if (firstItem && firstItem.colors && firstItem.colors.length > 0) return firstItem.colors;
-    return [];
-  }, [product?.colors, firstItem]);
+  const productColors =
+    (product?.colors?.length ? product.colors : firstItem?.colors) || [];
 
   // Asosiy rasm — tanlangan rang rasmi, yo'q bo'lsa product.image
   const selectedColorObj = productColors[selectedColorIndex] || null;
@@ -135,12 +132,19 @@ export default function ProductDetail() {
 
           {/* ── Chap ── */}
           <div>
-            <img
-              src={heroImage}
-              alt={displayTitle}
-              className="w-full rounded-2xl object-cover shadow-md transition-all duration-300"
-              style={{ maxHeight: 460 }}
-            />
+            {/* Rasm yuklanmaguncha (yoki yo'q bo'lsa) bo'sh "singan rasm" belgisi chiqmasin */}
+            {heroImage ? (
+              <img
+                src={heroImage}
+                alt={displayTitle}
+                className="w-full rounded-2xl object-cover shadow-md transition-all duration-300"
+                style={{ maxHeight: 460 }}
+              />
+            ) : (
+              <div className="w-full h-80 rounded-2xl bg-gray-100 flex items-center justify-center text-4xl shadow-sm">
+                🪟
+              </div>
+            )}
 
             <h1 className="text-gray-900 font-bold text-3xl mt-6 mb-3">{displayTitle}</h1>
             <p className="text-gray-500 text-base leading-relaxed mb-4">{displayDesc}</p>

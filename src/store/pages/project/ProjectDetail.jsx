@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useResolvedImages } from "../../data/remote";
 
 export default function ProjectDetail() {
   const { state: project } = useLocation();
@@ -10,7 +11,8 @@ export default function ProjectDetail() {
 
   const [lightboxIndex, setLightboxIndex] = useState(null); // null = yopiq
 
-  const images = project?.images || [];
+  // Admin yuklagan rasmlar "img:<id>" havolasi bo'lishi mumkin — haqiqiy rasmga aylantiramiz
+  const images = useResolvedImages(project?.images);
 
   const openLightbox = (i) => setLightboxIndex(i);
   const closeLightbox = () => setLightboxIndex(null);
@@ -121,12 +123,17 @@ export default function ProjectDetail() {
                             cursor-pointer group shadow-sm hover:shadow-xl
                             transition-shadow duration-300`}
               >
-                <img
-                  src={img}
-                  alt={`${project.title} - ${i + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-500
-                             group-hover:scale-105"
-                />
+                {img ? (
+                  <img
+                    src={img}
+                    alt={`${project.title} - ${i + 1}`}
+                    className="w-full h-full object-cover transition-transform duration-500
+                               group-hover:scale-105"
+                  />
+                ) : (
+                  // rasm hali yuklanmoqda
+                  <div className="w-full h-full bg-gray-100" />
+                )}
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30
                                 transition-all duration-300 flex items-center justify-center">
@@ -231,7 +238,9 @@ export default function ProjectDetail() {
                               ? "border-[#a80000] opacity-100 scale-110"
                               : "border-transparent opacity-50 hover:opacity-80"}`}
               >
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                {img
+                  ? <img src={img} alt="" className="w-full h-full object-cover" />
+                  : <div className="w-full h-full bg-white/10" />}
               </button>
             ))}
           </div>

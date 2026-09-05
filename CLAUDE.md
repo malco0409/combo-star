@@ -20,6 +20,9 @@ React 19 · Vite 8 · Tailwind v4 (`@tailwindcss/vite`) · react-router-dom v7 �
 - Yagona router `src/App.jsx` da. Store route'lari `StoreLayout` ostida, CRM `/admin/*` → `AdminApp`.
 - CRM ichidagi navigatsiya **`/admin/...` prefiks** bilan bo'lishi shart.
 - CRM qora mavzu `.crm-root` ichida scoped — storefront (light) ga ta'sir qilmasligi kerak.
+- Saytning qorong'i rejimi `index.css` dagi "QORONG'I REJIM" blokida (Tailwind utility'larini
+  bosib o'tuvchi CSS). Class `<html class="dark-mode">` — `index.html` dagi skript va
+  `src/store/utils/theme.js` qo'yadi. Yangi rang klassi ishlatilsa shu blokka qo'shiladi.
 - Telegram token/chat ID lar `.env` (`VITE_*`) dan. Kodga hardcode qilinmaydi. `.env` git'ga tushmaydi.
 - Yangi kutubxona qo'shishdan oldin so'ra; mavjud uslub/pattern'ga amal qil.
 - O'zgartirishdan keyin `npm run lint` bilan tekshir.

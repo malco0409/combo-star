@@ -131,6 +131,7 @@ const resources = {
         err_name: "Ism familiyangizni kiriting",
         err_phone: "Telefon raqamingizni kiriting",
         err_phone_invalid: "To'g'ri telefon raqam kiriting",
+        err_send: "Buyurtma yuborilmadi. Internetni tekshirib, qaytadan urinib ko'ring yoki +998 90 052 62 66 ga qo'ng'iroq qiling.",
         order_notice: "⚠️ Diqqat! Buyurtma berilgandan so'ng u to'liq individual ravishda tayyorlanadi — shuning uchun tasdiqlangandan keyin o'zgartirib bo'lmaydi.",
         guarantees: {
           g1: "Barcha buyurtmalarga bepul yetkazib berish",
@@ -201,6 +202,7 @@ const resources = {
         send: "Yuborish",
         sending: "Yuborilmoqda...",
         success: "Xabaringiz muvaffaqiyatli yuborildi!",
+        err_send: "Xabar yuborilmadi. Internetni tekshirib qayta urinib ko'ring.",
         err_name: "Ismingizni kiriting",
         err_email_empty: "Gmail kiriting",
         err_email_at: "Email manzilida '@' belgisi bo'lishi kerak",
@@ -241,6 +243,32 @@ const resources = {
         copyright: "Barcha huquqlar himoyalangan.",
       },
       back: "Orqaga",
+      no_images: "Rasmlar yo'q",
+      plisse: {
+        badge: "Interaktiv namuna",
+        title: "Plisse jalyuzini o'zingiz sinab ko'ring",
+        desc: "Ushlagichlarni yuqoriga yoki pastga torting — plisse xuddi haqiqiy derazadagidek yig'iladi va yoziladi. Yorug'likni xohlagan darajada boshqaring: yuqoridan ham, pastdan ham ochiladi.",
+        hint: "👆 Oq ushlagichni ushlab torting",
+        btn: "Plisse buyurtma qilish",
+        tagline: "Sifatli jalyuzilar",
+        top_handle: "Yuqori ushlagich",
+        bottom_handle: "Pastki ushlagich",
+        color_label: "Profil rangi",
+        frame_label: "Rom rangi",
+        fabric_label: "Mato rangi",
+        color_white: "Oq",
+        color_navy: "To'q ko'k (antratsit)",
+        color_brown: "Jigarrang (yong'oq)",
+      },
+      notfound: {
+        title: "Sahifa topilmadi",
+        desc: "Siz izlagan sahifa mavjud emas yoki ko'chirilgan. Quyidagi tugmalar orqali davom eting.",
+        home: "Bosh sahifaga",
+      },
+      theme: {
+        dark: "Qorong'i rejim",
+        light: "Yorug' rejim",
+      },
       loading: "Yuklanmoqda...",
       from: "dan",
       per_m2: "m² uchun",
@@ -386,6 +414,7 @@ const resources = {
         err_name: "Введите имя и фамилию",
         err_phone: "Введите номер телефона",
         err_phone_invalid: "Введите корректный номер телефона",
+        err_send: "Заказ не отправлен. Проверьте интернет и попробуйте ещё раз или позвоните: +998 90 052 62 66.",
         order_notice: "⚠️ Внимание! После оформления заказ изготавливается индивидуально — поэтому после подтверждения его нельзя изменить.",
         guarantees: {
           g1: "Бесплатная доставка для всех заказов",
@@ -456,6 +485,7 @@ const resources = {
         send: "Отправить",
         sending: "Отправка...",
         success: "Ваше сообщение успешно отправлено!",
+        err_send: "Сообщение не отправлено. Проверьте интернет и попробуйте ещё раз.",
         err_name: "Введите ваше имя",
         err_email_empty: "Введите email",
         err_email_at: "Email должен содержать символ '@'",
@@ -496,6 +526,32 @@ const resources = {
         copyright: "Все права защищены.",
       },
       back: "Назад",
+      no_images: "Фотографий нет",
+      plisse: {
+        badge: "Интерактивный пример",
+        title: "Попробуйте жалюзи плиссе сами",
+        desc: "Потяните ручки вверх или вниз — плиссе складывается и раскладывается как на настоящем окне. Управляйте светом как удобно: открывается и сверху, и снизу.",
+        hint: "👆 Возьмитесь за белую ручку и потяните",
+        btn: "Заказать плиссе",
+        tagline: "Качественные жалюзи",
+        top_handle: "Верхняя ручка",
+        bottom_handle: "Нижняя ручка",
+        color_label: "Цвет профиля",
+        frame_label: "Цвет рамы",
+        fabric_label: "Цвет ткани",
+        color_white: "Белый",
+        color_navy: "Тёмно-синий (антрацит)",
+        color_brown: "Коричневый (орех)",
+      },
+      notfound: {
+        title: "Страница не найдена",
+        desc: "Запрошенная страница не существует или была перемещена. Воспользуйтесь кнопками ниже.",
+        home: "На главную",
+      },
+      theme: {
+        dark: "Тёмная тема",
+        light: "Светлая тема",
+      },
       loading: "Загрузка...",
       from: "от",
       per_m2: "за м²",
@@ -513,13 +569,28 @@ const resources = {
   },
 };
 
+// Saqlangan til — birinchi renderdayoq to'g'ri til bilan chizilishi uchun
+// (avval Navbar effekti tilni keyin almashtirardi va matn "sakrab" ketardi).
+function savedLang() {
+  try {
+    const v = localStorage.getItem("lang");
+    return v === "ru" || v === "uz" ? v : "uz";
+  } catch {
+    return "uz";
+  }
+}
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: "uz",
+    lng: savedLang(),
     fallbackLng: "uz",
     interpolation: { escapeValue: false },
   });
+
+// <html lang="..."> — qidiruv tizimlari va ekran o'quvchilari uchun
+document.documentElement.lang = i18n.language;
+i18n.on("languageChanged", (lng) => { document.documentElement.lang = lng; });
 
 export default i18n;

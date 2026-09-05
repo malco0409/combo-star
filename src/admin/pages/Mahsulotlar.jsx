@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useProducts, saveProduct, resetProduct } from "../../store/data/productStore";
-import { saveImageData, useResolvedImage } from "../../store/data/remote";
+import { saveImageData } from "../../store/data/remote";
 import Img from "../../store/components/Img";
 import { fileToDataURL } from "../utils/image";
 

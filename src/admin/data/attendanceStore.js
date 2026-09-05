@@ -405,7 +405,7 @@ export function getUserDayList(userId, nowIso = null) {
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function summarize(dayList, { week = false, month = false } = {}) {
+export function summarize(dayList) {
   const totalMin = dayList.reduce((s, d) => s + d.workedMin, 0);
   const totalPauseMin = dayList.reduce((s, d) => s + d.pauseMin, 0);
   return {

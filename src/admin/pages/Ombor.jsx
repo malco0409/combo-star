@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getCollections, saveCollections, genId } from "../data/store";
 
 const card = { background: "#1a1f2e", border: "1px solid #2d3748", borderRadius: "12px" };
@@ -20,6 +20,7 @@ const TYPE_STYLES = {
   ATXOD: { background: "#3d2e00", color: "#fbbf24" },
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const PRODUCTS = ["Plisse", "Combo", "Dikkey", "Rollo", "DablRoll", "Maskitniy setka", "Senaks", "Razdvijnoy"];
 
 const EMPTY_COL = { name: "", flag: "", type: "RULON", len: "", width: "", product: PRODUCTS[0], stock: true };
@@ -29,7 +30,7 @@ function sqm(w, h, qty) {
 }
 
 export default function Ombor() {
-  const [cols, setCols] = useState([]);
+  const [cols, setCols] = useState(getCollections);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterStock, setFilterStock] = useState("");
@@ -41,8 +42,6 @@ export default function Ombor() {
   const [editVal, setEditVal] = useState({ w: "", h: "", qty: "" });
   const [editingCol, setEditingCol] = useState(null);
   const [editColVal, setEditColVal] = useState({});
-
-  useEffect(() => { setCols(getCollections()); }, []);
 
   const update = (data) => { setCols(data); saveCollections(data); };
 

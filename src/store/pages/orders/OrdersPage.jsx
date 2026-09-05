@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCart } from "../../context/CartContext";
+import Img from "../../components/Img";
 
 const statusKeys = {
   "Qabul qilindi 📬":  "orders.status.accepted",
@@ -102,7 +103,12 @@ export default function OrdersPage() {
                 <div className="flex flex-col gap-3">
                   {order.items.map((item, i) => (
                     <div key={i} className="flex gap-3 items-center border-b border-gray-100 pb-3 last:border-0 last:pb-0">
-                      <img src={item.product.image} alt={item.product.title} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
+                      <Img
+                        src={item.product.image}
+                        alt={item.product.title}
+                        className="w-14 h-14 rounded-xl object-cover flex-shrink-0"
+                        fallback={<div className="w-14 h-14 rounded-xl bg-gray-100 flex-shrink-0" />}
+                      />
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-gray-900 text-sm truncate">{item.product.title}</p>
                         <p className="text-gray-500 text-xs">

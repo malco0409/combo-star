@@ -9,7 +9,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
     };
     if (isOpen) document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   // Scroll bloklash
   useEffect(() => {
