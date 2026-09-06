@@ -1,0 +1,170 @@
+/* DoubleRolloWindow — dabl rollo (ikkili stor: tyul + qalin blackout).
+   Manba: /Users/ayub/gemini/uygavazifa/jalyuzi-animatsiyasi/double-rollo-style.css
+   Uslublar asl fayldagidek: ikkala mato (shaffoflik va blur bilan) va
+   ikki tomondagi zanjirlar. Faqat: global `*`/`body` qoidalari olib tashlandi
+   va selektorlar `.drollo-window` ichiga yopildi.
+   Manzara (osmon/quyosh/logotip) — umumiy WindowScene.css da. */
+
+.drollo-window {
+  --dw-back: #2c3e50;                        /* qalin (blackout) mato */
+  --dw-front: rgba(245, 246, 250, .7);       /* shaffof tyul */
+
+  width: 380px;
+  max-width: 100%;
+  height: 600px;
+  background: #e0e5ec;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .5), inset 0 0 0 5px #fff;
+  position: relative;
+  margin: 0 auto;
+  font-family: "Outfit", "Nunito", sans-serif;
+  container-type: inline-size;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.drollo-window .window-frame {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, .1);
+}
+
+/* Deraza ortidagi manzara — umumiy <WindowScene/> shu joyga */
+.drollo-window .view-outside {
+  position: absolute;
+  top: 15px; left: 30px; right: 30px; bottom: 15px;
+  border-radius: 5px;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, .1);
+}
+
+/* ── DOUBLE ROLLO ── */
+.drollo-window .rollo-container {
+  position: absolute;
+  top: 15px; left: 30px; right: 30px; bottom: 15px;
+  z-index: 20;
+  pointer-events: none;      /* mato bo'lmagan joyda bosish zanjirga o'tsin */
+}
+
+/* Yagona kattaroq kasseta (ikki rolik bitta kassetada) */
+.drollo-window .rollo-top-cassette {
+  position: absolute;
+  top: -5px; left: -5px; right: -5px;
+  height: 40px;
+  background: linear-gradient(to bottom, #dcdde1, #f5f6fa);
+  border-radius: 4px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .3);
+  z-index: 25;
+}
+
+/* Orqa qavat (qalin blackout) */
+.drollo-window .rollo-back-fabric {
+  position: absolute;
+  top: 20px; left: 0; right: 0;
+  height: 100px;             /* boshlang'ich — JS o'zgartiradi */
+  background-color: var(--dw-back);
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, .05) 0%, transparent 50%, rgba(0, 0, 0, .2) 100%);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, .4);
+  z-index: 21;               /* tyuldan orqada */
+  transition: background-color .25s ease;
+}
+
+/* Oldingi qavat (tyul / shaffof) */
+.drollo-window .rollo-front-fabric {
+  position: absolute;
+  top: 30px; left: 0; right: 0;
+  height: 150px;             /* boshlang'ich — JS o'zgartiradi */
+  background-color: var(--dw-front);
+  background-image: repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(0, 0, 0, .02) 10px, rgba(0, 0, 0, .02) 12px);
+  backdrop-filter: blur(1px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
+  z-index: 22;               /* blackout ustida */
+  transition: background-color .25s ease;
+}
+
+/* Pastki gruzlar */
+.drollo-window .bottom-weight {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 12px;
+  border-radius: 2px 2px 5px 5px;
+}
+.drollo-window .back-weight {
+  background: linear-gradient(to bottom, #1a252f, #2c3e50);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, .4);
+}
+.drollo-window .front-weight {
+  background: linear-gradient(to bottom, #dcdde1, #bdc3c7);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, .2);
+}
+
+/* ── Boshqaruv mexanizmlari (chap va o'ng tomonda) ── */
+.drollo-window .control-panel {
+  position: absolute;
+  top: 15px;
+  height: 90%;
+  width: 30px;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+}
+.drollo-window .left-control  { left: 0; }
+.drollo-window .right-control { right: 0; }
+
+.drollo-window .chain-container {
+  position: absolute;
+  top: 0;
+  width: 16px;
+  height: 350px;
+  cursor: grab;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .4));
+  pointer-events: auto;
+  touch-action: none;        /* zanjirni tortganda sahifa siljimasin */
+}
+.drollo-window .chain-container:active { cursor: grabbing; }
+.drollo-window .chain-container:focus-visible {
+  outline: 3px solid #a80000;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.drollo-window .chain-right {
+  position: absolute; top: 0; right: 0;
+  width: 6px; height: 100%;
+  background-image: radial-gradient(circle, #bdc3c7 60%, transparent 60%);
+  background-size: 6px 9px;
+  background-repeat: repeat-y;
+}
+.drollo-window .chain-left {
+  position: absolute; top: 0; left: 0;
+  width: 6px; height: 100%;
+  background-image: radial-gradient(circle, #bdc3c7 60%, transparent 60%);
+  background-size: 6px 9px;
+  background-repeat: repeat-y;
+}
+.drollo-window .chain-bottom-loop {
+  position: absolute;
+  bottom: -6px; left: 0;
+  width: 16px; height: 12px;
+  border: 4px solid #bdc3c7;
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  box-sizing: border-box;
+}
+
+.drollo-window .control-label {
+  position: absolute;
+  bottom: -20px; left: -10px;
+  width: 50px;
+  font-size: .6rem;
+  text-align: center;
+  color: #555;
+  font-weight: bold;
+  pointer-events: none;
+}

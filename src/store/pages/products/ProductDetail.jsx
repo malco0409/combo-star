@@ -5,6 +5,7 @@ import { useCart } from "../../context/CartContext";
 import { useCollection, colorLabel } from "../../data/collectionStore";
 import { useResolvedImage } from "../../data/remote";
 import Img from "../../components/Img";
+import ProductAnimation, { hasProductAnimation } from "../../components/ProductAnimation";
 
 export default function ProductDetail() {
   const { t, i18n } = useTranslation();
@@ -27,6 +28,9 @@ export default function ProductDetail() {
 
   // Kolleksiya/ranglar CRM ("/admin/kolleksiyalar") orqali boshqariladi — Firestore dan jonli.
   const productCollection = useCollection(productId);
+
+  // Shu mahsulot uchun interaktiv animatsiya bormi?
+  const showAnimation = hasProductAnimation(productId);
 
   const label = (c) => colorLabel(c, t, i18n.language);
 
@@ -151,6 +155,15 @@ export default function ProductDetail() {
             <p className="text-[#a80000] font-bold text-2xl mb-6">
               {t("from")} {symbol}{price} / m²
             </p>
+
+            {/* Interaktiv namuna (mahsulotga animatsiya bo'lsa) */}
+            {showAnimation && (
+              <div className="bg-white rounded-2xl shadow-sm p-5 mb-6">
+                <h3 className="font-bold text-gray-900 mb-1">{t("product.demo_title")}</h3>
+                <p className="text-gray-500 text-sm mb-5">{t("product.demo_hint")}</p>
+                <ProductAnimation productId={productId} />
+              </div>
+            )}
 
             {/* Xususiyatlar */}
             <div className="bg-white rounded-2xl shadow-sm p-5">

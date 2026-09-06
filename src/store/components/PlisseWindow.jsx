@@ -3,6 +3,7 @@
 // Uslublar PlisseWindow.css da, hammasi `.plisse-window` ichiga yopilgan.
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import WindowScene from "./WindowScene";
 import "./PlisseWindow.css";
 
 const FOLDS = 40;
@@ -312,9 +313,6 @@ export default function PlisseWindow() {
     if (repaintRef.current) repaintRef.current();
   }, [fabric.hex]);
 
-  const starPath =
-    "M12 2 L15.09 8.26 L22 9.27 L17 14.14 L18.18 21.02 L12 17.77 L5.82 21.02 L7 14.14 L2 9.27 L8.91 8.26 Z";
-
   const colorVars = {
     "--pw-profile": profileColor.profile,
     "--pw-profile-border": profileColor.border,
@@ -328,30 +326,8 @@ export default function PlisseWindow() {
   return (
     <div>
     <div className="plisse-window" style={colorVars}>
-      {/* Deraza ortidagi manzara */}
-      <div className="view-outside">
-        <div className="sky">
-          <div className="sun" />
-          <div className="cloud cloud-1" />
-          <div className="cloud cloud-2" />
-          <div className="cloud cloud-3" />
-        </div>
-
-        <div className="mountains" />
-
-        <div className="ground">
-          <div className="road"><div className="road-line" /></div>
-        </div>
-
-        <div className="logo-container">
-          <svg className="bordo-star" viewBox="-4 -4 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d={starPath} stroke="#cc0000" strokeWidth="4" strokeLinejoin="round" />
-            <path d={starPath} stroke="#ffffff" strokeWidth="1.5" strokeLinejoin="round" fill="none" />
-          </svg>
-          <p className="logo-text">COMBO STAR</p>
-          <p className="logo-tagline">{t("plisse.tagline")}</p>
-        </div>
-      </div>
+      {/* Deraza ortidagi manzara (umumiy komponent) */}
+      <div className="scene-slot"><WindowScene /></div>
 
       {/* Jalyuzi: ikkala profilni tortish mumkin */}
       <div className="plisse-container" ref={containerRef}>
@@ -374,7 +350,7 @@ export default function PlisseWindow() {
     </div>
 
     {/* Rang tanlash: profil va rom alohida */}
-    <div className="plisse-colors">
+    <div className="win-colors">
       <ColorRow label={t("plisse.color_label")} value={profileId} onChange={setProfileId} t={t} />
       <ColorRow label={t("plisse.frame_label")} value={frameId}   onChange={setFrameId}   t={t} />
 

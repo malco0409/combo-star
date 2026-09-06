@@ -1,0 +1,223 @@
+/* SetkaWindow — suriladigan moskit setka: OYNA rejimi (tepadan pastga) va
+   ESHIK rejimi (yondan yonga, plisse akkordeon).
+   Manba: /Users/ayub/gemini/uygavazifa/jalyuzi-animatsiyasi/setka-style.css
+   Uslublar asl fayldagidek: realistik setka (mesh) to'ri, eshik uchun akkordeon
+   burmalar (`.door-fabric::after`), tutqich va tukli cho'tka (brush seal) chetlari.
+   Faqat: global `*`/`body` va global `button` qoidalari olib tashlandi/scoped qilindi,
+   selektorlar `.setka-window` / `.setka-controls` ichiga yopildi.
+   Manzara (osmon/quyosh/logotip) — umumiy WindowScene.css da. */
+
+/* ── Rejim tugmalari ── */
+.setka-controls {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.setka-controls button {
+  padding: 10px 20px;
+  font-size: .95rem;
+  cursor: pointer;
+  background: #2c3e50;
+  color: #fff;
+  border: 2px solid #34495e;
+  border-radius: 5px;
+  transition: all .3s ease;
+  font-family: inherit;
+}
+
+.setka-controls button.active {
+  background: #cc0000;
+  border-color: #ff3333;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(204, 0, 0, .5);
+}
+
+.setka-controls button:focus-visible {
+  outline: 3px solid #a80000;
+  outline-offset: 3px;
+}
+
+/* ── Deraza ── */
+.setka-window {
+  width: 380px;
+  max-width: 100%;
+  height: 500px;             /* oyna rejimi uchun pastroq */
+  background: #e0e5ec;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .5), inset 0 0 0 5px #fff;
+  position: relative;
+  margin: 0 auto;
+  transition: height .5s ease, width .5s ease;
+  font-family: "Outfit", "Nunito", sans-serif;
+  container-type: inline-size;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Eshik rejimida balandroq va biroz torroq */
+.setka-window.door-mode {
+  width: 350px;
+  height: 650px;
+}
+
+.setka-window .window-frame {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, .1);
+}
+
+/* Deraza ortidagi manzara — umumiy <WindowScene/> shu joyga */
+.setka-window .view-outside {
+  position: absolute;
+  top: 15px; left: 15px; right: 15px; bottom: 15px;
+  border-radius: 5px;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, .1);
+}
+
+/* Setka wrapperlari */
+.setka-window .net-wrapper {
+  position: absolute;
+  top: 15px; left: 15px; right: 15px; bottom: 15px;
+  z-index: 20;
+  transition: opacity .3s;
+}
+.setka-window .hidden {
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* =========================================
+   OYNA SETKASI (tepadan pastga)
+   ========================================= */
+.setka-window .window-net .net-cassette-top {
+  position: absolute;
+  top: -5px; left: -5px; right: -5px;
+  height: 30px;
+  background: linear-gradient(to bottom, #dcdde1, #f5f6fa);
+  border-radius: 4px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .3);
+  z-index: 25;
+}
+
+.setka-window .window-fabric {
+  position: absolute;
+  top: 15px; left: 0; right: 0;
+  height: 100px;             /* boshlang'ich uzunlik — JS o'zgartiradi */
+
+  /* Realistik setka (mesh) effekti */
+  background-color: rgba(20, 20, 20, .2);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, .7) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, .7) 1px, transparent 1px);
+  background-size: 4px 4px;
+
+  backdrop-filter: blur(.5px);
+  z-index: 21;
+}
+
+.setka-window .handle-bottom {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 30px;
+  background: linear-gradient(to bottom, #dcdde1, #bdc3c7);
+  border-bottom: 5px dotted #555;   /* tukli cho'tka (brush seal) */
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, .3);
+  cursor: grab;
+  touch-action: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.setka-window .handle-bottom:active { cursor: grabbing; }
+.setka-window .handle-bottom:focus-visible,
+.setka-window .handle-side:focus-visible {
+  outline: 3px solid #a80000;
+  outline-offset: 2px;
+}
+
+/* Potay (ichkariga kirgan chuqurcha) shaklidagi tutqich */
+.setka-window .handle-bottom .handle-grip {
+  width: 60px; height: 12px;
+  background: #aab0b5;
+  border-radius: 6px;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, .6), inset 0 -1px 2px rgba(255, 255, 255, .8);
+}
+
+/* =========================================
+   ESHIK SETKASI (yondan yonga — plisse setka)
+   ========================================= */
+.setka-window .door-net .net-cassette-side {
+  position: absolute;
+  top: -5px; right: -5px; bottom: -5px;
+  width: 30px;               /* o'ng tomonga qotirilgan */
+  background: linear-gradient(to left, #dcdde1, #f5f6fa);
+  border-radius: 4px;
+  box-shadow: -5px 0 10px rgba(0, 0, 0, .3);
+  z-index: 25;
+}
+
+.setka-window .door-fabric {
+  position: absolute;
+  top: 0; right: 15px; bottom: 0;
+  width: 150px;              /* boshlang'ich kenglik — JS o'zgartiradi */
+
+  background-color: rgba(20, 20, 20, .2);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, .7) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, .7) 1px, transparent 1px);
+  background-size: 4px 4px;
+
+  backdrop-filter: blur(.5px);
+  z-index: 21;
+}
+
+/* Plisse akkordeon burmalari ( /_/_/_/ ) */
+.setka-window .door-fabric::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(90deg,
+    rgba(0, 0, 0, .5) 0px,
+    rgba(0, 0, 0, .1) 5px,
+    rgba(255, 255, 255, .05) 15px,
+    rgba(255, 255, 255, .2) 20px,
+    rgba(255, 255, 255, .05) 25px,
+    rgba(0, 0, 0, .1) 35px
+  );
+  pointer-events: none;
+}
+
+/* Tutqich — matoning chap tomonida */
+.setka-window .handle-side {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 30px;
+  background: linear-gradient(to right, #dcdde1, #bdc3c7);
+  border-left: 5px dotted #555;     /* tukli cho'tka (brush seal) */
+  box-shadow: -4px 0 6px rgba(0, 0, 0, .3);
+  cursor: grab;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.setka-window .handle-side:active { cursor: grabbing; }
+
+.setka-window .handle-side .handle-grip {
+  height: 80px; width: 12px;
+  background: #aab0b5;
+  border-radius: 6px;
+  box-shadow: inset 3px 0 6px rgba(0, 0, 0, .6), inset -1px 0 2px rgba(255, 255, 255, .8);
+}
