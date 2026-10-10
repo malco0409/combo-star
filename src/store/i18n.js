@@ -1,5 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import { PHONE_DISPLAY } from "../shared/contact";
 
 const resources = {
   uz: {
@@ -133,7 +134,7 @@ const resources = {
         err_name: "Ism familiyangizni kiriting",
         err_phone: "Telefon raqamingizni kiriting",
         err_phone_invalid: "To'g'ri telefon raqam kiriting",
-        err_send: "Buyurtma yuborilmadi. Internetni tekshirib, qaytadan urinib ko'ring yoki +998 90 052 62 66 ga qo'ng'iroq qiling.",
+        err_send: `Buyurtma yuborilmadi. Internetni tekshirib, qaytadan urinib ko'ring yoki ${PHONE_DISPLAY} ga qo'ng'iroq qiling.`,
         order_notice: "⚠️ Diqqat! Buyurtma berilgandan so'ng u to'liq individual ravishda tayyorlanadi — shuning uchun tasdiqlangandan keyin o'zgartirib bo'lmaydi.",
         guarantees: {
           g1: "Barcha buyurtmalarga bepul yetkazib berish",
@@ -450,7 +451,7 @@ const resources = {
         err_name: "Введите имя и фамилию",
         err_phone: "Введите номер телефона",
         err_phone_invalid: "Введите корректный номер телефона",
-        err_send: "Заказ не отправлен. Проверьте интернет и попробуйте ещё раз или позвоните: +998 90 052 62 66.",
+        err_send: `Заказ не отправлен. Проверьте интернет и попробуйте ещё раз или позвоните: ${PHONE_DISPLAY}.`,
         order_notice: "⚠️ Внимание! После оформления заказ изготавливается индивидуально — поэтому после подтверждения его нельзя изменить.",
         guarantees: {
           g1: "Бесплатная доставка для всех заказов",

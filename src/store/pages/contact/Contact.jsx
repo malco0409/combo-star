@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { sendContactToTelegram } from "../../utils/telegram";
+import { PHONE_DISPLAY, PHONE_TEL } from "../../../shared/contact";
 
 export default function Contact() {
   const { t } = useTranslation();
@@ -114,8 +115,8 @@ export default function Contact() {
                 </svg>
                 <span className="font-bold text-gray-900">{t("contact.phone")}</span>
               </div>
-              <a href="tel:+998900526266" className="text-gray-500 text-sm hover:text-[#a80000] transition-colors">
-                +998 90 052-62-66
+              <a href={`tel:${PHONE_TEL}`} className="text-gray-500 text-sm hover:text-[#a80000] transition-colors">
+                {PHONE_DISPLAY}
               </a>
             </div>
 

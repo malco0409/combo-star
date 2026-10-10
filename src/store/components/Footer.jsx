@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { PHONE_DISPLAY, PHONE_TEL } from "../../shared/contact";
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -57,8 +58,8 @@ export default function Footer() {
             </li>
             <li>
               {t("contact.phone")}:{" "}
-              <a href="tel:+998900526266" className="hover:text-white transition-colors duration-200">
-                +998 90 052 62 66
+              <a href={`tel:${PHONE_TEL}`} className="hover:text-white transition-colors duration-200">
+                {PHONE_DISPLAY}
               </a>
             </li>
           </ul>
